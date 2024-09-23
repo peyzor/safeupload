@@ -1,4 +1,6 @@
 import argparse
+import pathlib
+
 from cryptography.fernet import Fernet
 
 
@@ -40,19 +42,20 @@ def decrypt_file(filepath, key_filename):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(prog='safe upload')
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-k', '--keypath', default='keyfile.key')
 
-    # parser.add_argument('-fe', '--file-encrypt')
-    parser.add_argument('-fd', '--file-decrypt')
-    parser.add_argument('-k', '--key')
+    group = parser.add_mutually_exclusive_group(required=False)
+    group.add_argument('-fe', '--file-encrypt')
+    group.add_argument('-fd', '--file-decrypt')
 
     args = parser.parse_args()
 
-    # key_filename = 'keyfile.key'
-    # filepath = '/Users/peyman627/Downloads/nba.csv'
-    # file_encrypt = args.file_encrypt
-    file_decrypt = args.file_decrypt
-    keypath = args.key
-    # generate_key(keypath)
-    # encrypt_file(file_encrypt, keypath)
-    decrypt_file(file_decrypt, keypath)
+    keyfile = pathlib.Path(args.keypath)
+    if not keyfile.exists():
+        generate_key(args.keypath)
+
+    if args.file_encrypt:
+        encrypt_file(args.file_encrypt, args.keypath)
+    elif args.file_decrypt:
+        decrypt_file(args.file_decrypt, args.keypath)
