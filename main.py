@@ -1,21 +1,22 @@
 import argparse
+import os
 import pathlib
 
 from cryptography.fernet import Fernet
+from dotenv import load_dotenv
+
+ENV_FILENAME = '.env'
+FERNET_KEY = 'FERNET_KEY'
 
 
-def generate_key(name):
-    key = Fernet.generate_key()
-
-    with open(name, 'wb') as keyfile:
-        keyfile.write(key)
+def generate_key():
+    return Fernet.generate_key()
 
 
-def encrypt_file(filepath, key_filename):
-    with open(key_filename, 'rb') as keyfile:
-        key = keyfile.read()
+def encrypt_file(filepath):
+    fernet_key = os.environ[FERNET_KEY]
 
-    fernet = Fernet(key)
+    fernet = Fernet(fernet_key)
 
     with open(filepath, 'rb') as file:
         original = file.read()
@@ -26,11 +27,10 @@ def encrypt_file(filepath, key_filename):
         encrypted_file.write(encrypted)
 
 
-def decrypt_file(filepath, key_filename):
-    with open(key_filename, 'rb') as keyfile:
-        key = keyfile.read()
+def decrypt_file(filepath):
+    fernet_key = os.environ[FERNET_KEY]
 
-    fernet = Fernet(key)
+    fernet = Fernet(fernet_key)
 
     with open(filepath, 'rb') as enc_file:
         encrypted = enc_file.read()
@@ -41,9 +41,31 @@ def decrypt_file(filepath, key_filename):
         dec_file.write(decrypted)
 
 
+def make_sure_fernet_key_exists():
+    fernet_key = os.environ.get(FERNET_KEY)
+
+    if fernet_key:
+        return
+
+    fernet_key = generate_key()
+    fernet_key_str = fernet_key.decode('utf-8')
+
+    with open(ENV_FILENAME, 'a') as f:
+        f.write(f"\n{FERNET_KEY}='{fernet_key_str}'")
+
+    os.environ[f'{FERNET_KEY}'] = fernet_key_str
+
+
 if __name__ == '__main__':
+    if not pathlib.Path(ENV_FILENAME).exists():
+        with open(ENV_FILENAME, 'w') as f:
+            f.write('# Add necessary environment variables here\n')
+
+    load_dotenv()
+
+    make_sure_fernet_key_exists()
+
     parser = argparse.ArgumentParser()
-    parser.add_argument('-k', '--keypath', default='keyfile.key')
 
     group = parser.add_mutually_exclusive_group(required=False)
     group.add_argument('-fe', '--file-encrypt')
@@ -51,11 +73,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    keyfile = pathlib.Path(args.keypath)
-    if not keyfile.exists():
-        generate_key(args.keypath)
-
     if args.file_encrypt:
-        encrypt_file(args.file_encrypt, args.keypath)
+        encrypt_file(args.file_encrypt)
     elif args.file_decrypt:
-        decrypt_file(args.file_decrypt, args.keypath)
+        decrypt_file(args.file_decrypt)
