@@ -24,6 +24,7 @@ def encrypt_file(filepath):
 
 
 def decrypt_file(filepath):
+    # Todo: can't decrypt unencrypted file
     fernet_key = os.environ[config.FERNET_KEYNAME]
 
     fernet = Fernet(fernet_key)
