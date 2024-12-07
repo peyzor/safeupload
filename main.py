@@ -18,8 +18,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     group = parser.add_mutually_exclusive_group(required=False)
-    group.add_argument('-fe', '--file-encrypt')
-    group.add_argument('-fd', '--file-decrypt')
+    group.add_argument('-e', '--file-encrypt')
+    group.add_argument('-d', '--file-decrypt')
 
     args = parser.parse_args()
 
