@@ -10,7 +10,7 @@ def generate_key():
 
 
 def encrypt_file(filepath):
-    fernet_key = os.environ[config.FERNET_KEY]
+    fernet_key = os.environ[config.FERNET_KEYNAME]
 
     fernet = Fernet(fernet_key)
 
@@ -24,7 +24,7 @@ def encrypt_file(filepath):
 
 
 def decrypt_file(filepath):
-    fernet_key = os.environ[config.FERNET_KEY]
+    fernet_key = os.environ[config.FERNET_KEYNAME]
 
     fernet = Fernet(fernet_key)
 
@@ -38,7 +38,7 @@ def decrypt_file(filepath):
 
 
 def make_sure_fernet_key_exists():
-    fernet_key = os.environ.get(config.FERNET_KEY)
+    fernet_key = os.environ.get(config.FERNET_KEYNAME)
 
     if fernet_key:
         return
@@ -47,6 +47,6 @@ def make_sure_fernet_key_exists():
     fernet_key_str = fernet_key.decode('utf-8')
 
     with open(config.ENV_FILENAME, 'a') as f:
-        f.write(f"\n{config.FERNET_KEY}='{fernet_key_str}'")
+        f.write(f"\n{config.FERNET_KEYNAME}='{fernet_key_str}'")
 
-    os.environ[f'{config.FERNET_KEY}'] = fernet_key_str
+    os.environ[f'{config.FERNET_KEYNAME}'] = fernet_key_str
