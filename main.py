@@ -18,12 +18,12 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     group = parser.add_mutually_exclusive_group(required=False)
-    group.add_argument('-e', '--file-encrypt')
-    group.add_argument('-d', '--file-decrypt')
+    group.add_argument('-e', '--encrypt-file')
+    group.add_argument('-d', '--decrypt-file')
 
     args = parser.parse_args()
 
-    if args.file_encrypt:
-        crypto.encrypt_file(args.file_encrypt)
-    elif args.file_decrypt:
-        crypto.decrypt_file(args.file_decrypt)
+    if args.encrypt_file:
+        crypto.encrypt_file(args.encrypt_file)
+    elif args.decrypt_file:
+        crypto.decrypt_file(args.decrypt_file)
